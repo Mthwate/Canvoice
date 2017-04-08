@@ -1,4 +1,4 @@
-package com.canvoice;
+package com.canvoice.restObjects;
 
 /**
  * Created by corey on 4/8/2017.

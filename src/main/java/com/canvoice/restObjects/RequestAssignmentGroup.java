@@ -1,4 +1,6 @@
-package com.canvoice;
+package com.canvoice.restObjects;
+
+import com.canvoice.restObjects.RequestAssignment;
 
 /**
  * Created by corey on 4/8/2017.

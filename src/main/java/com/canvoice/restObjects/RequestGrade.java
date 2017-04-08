@@ -1,7 +1,11 @@
-package com.canvoice;
+package com.canvoice.restObjects;
 
 /**
  * Created by corey on 4/8/2017.
+ */
+
+/**
+ * This class is for the course grade. View submission for assignment grade.
  */
 public class RequestGrade {
     public String current_grade;
