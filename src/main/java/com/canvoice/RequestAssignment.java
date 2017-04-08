@@ -9,4 +9,5 @@ public class RequestAssignment {
     public String description;
     public String due_at;
     public int course_id;
+    RequestSubmission submission;
 }
