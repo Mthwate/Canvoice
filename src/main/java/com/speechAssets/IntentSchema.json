@@ -5,7 +5,7 @@
       "slots": [
         {
           "name": "class",
-          "type": "AMAZON.LITERAL"
+          "type": "LIST_OF_CLASSES"
         }
       ]
     },
