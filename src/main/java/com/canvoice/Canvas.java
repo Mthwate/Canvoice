@@ -1,5 +1,6 @@
 package com.canvoice;
 
+import com.canvoice.restObjects.RequestCourses;
 import com.google.api.client.auth.oauth2.BearerToken;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.GenericUrl;
@@ -32,6 +33,21 @@ public class Canvas {
 		JsonObjectParser parser = new JsonObjectParser(new JacksonFactory());
 		HttpResponse response = requestFactory.buildGetRequest(new GenericUrl(BASE_URL + resource)).setParser(parser).execute();
 		return response.parseAs(dataClass);
+	}
+
+	public String getCourseGrade(String courseName) {
+		String courseGrade = "Unable to get classes.";
+		try {
+			RequestCourses[] ca = read("courses", RequestCourses[].class);
+			for (RequestCourses c : ca) {
+				if(c.name.equals(courseName) || c.course_code.equals(courseName)) {
+					courseGrade = c.enrollments.computed_current_grade;
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return courseGrade;
 	}
 
 }
