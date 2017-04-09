@@ -1,6 +1,6 @@
 {
   "intents": [
-    {
+	{
       "intent": "GetGradeInClass",
       "slots": [
         {
@@ -13,6 +13,19 @@
       "intent": "GetUpcomingInClass",
       "slots": [
         {
+          "name": "class",
+          "type": "LIST_OF_CLASSES"
+        }
+      ]
+    },
+	{
+      "intent": "GetAssignmentGrade",
+      "slots": [
+        {
+          "name": "assignment",
+          "type": "LIST_OF_ASSIGNMENTS"
+        },
+		{
           "name": "class",
           "type": "LIST_OF_CLASSES"
         }
