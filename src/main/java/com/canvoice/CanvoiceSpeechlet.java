@@ -87,10 +87,9 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
 
 		switch (intentName) {
 			case "GetGradeInClass":
-				String courseName = intent.getSlot("class").getValue();
-				return output(canvas.getCourses()[1]);
+				String courseName = nameLocalToCanvas(intent.getSlot("class").getValue());
+				return output(canvas.getCourse(courseName));
 		}
-
 
 
 
@@ -141,6 +140,21 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
 		for (int i = 0; i < c.length; i++) {
 			output(c[i]);
 		}
+	}
+
+	private String nameLocalToCanvas(String name) {
+		try {
+			PreparedStatement statement = connection.prepareStatement("select canvas from name_map where local = ?");
+			statement.setString(1, name);
+			statement.execute();
+			ResultSet resultSet = statement.getResultSet();
+			if (resultSet.next()) {
+				return resultSet.getString(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }
