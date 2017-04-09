@@ -14,3 +14,13 @@ dependencies {
 	compile 'com.google.oauth-client:google-oauth-client:1.22.0'
 	compile 'com.google.http-client:google-http-client-jackson2:1.22.0'
 }
+
+task buildZip(type: Zip) {
+	from compileJava
+	from processResources
+	into('lib') {
+		from configurations.runtime
+	}
+}
+
+build.dependsOn buildZip
