@@ -5,7 +5,7 @@ import com.google.api.client.util.Key;
 /**
  * Created by corey on 4/8/2017.
  */
-public class RequestSubmission {
+public class Submission {
     @Key
     int assignment_id;
     @Key

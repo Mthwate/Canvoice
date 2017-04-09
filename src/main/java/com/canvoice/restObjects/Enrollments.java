@@ -5,7 +5,7 @@ import com.google.api.client.util.Key;
 /**
  * Created by corey on 4/8/2017.
  */
-public class RequestEnrollments {
+public class Enrollments {
     @Key
     public int id;
     @Key
@@ -13,7 +13,7 @@ public class RequestEnrollments {
     @Key
     public int user_id;
     @Key
-    public RequestGrade grades;
+    public Grade grades;
     @Key
     public double computed_current_score;
     @Key

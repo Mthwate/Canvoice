@@ -5,17 +5,15 @@ import com.google.api.client.util.Key;
 /**
  * Created by corey on 4/8/2017.
  */
-public class RequestAssignment {
+public class Course {
     @Key
     public int id;
     @Key
     public String name;
     @Key
-    public String description;
+    public String course_code;
     @Key
-    public String due_at;
+    public String public_description;
     @Key
-    public int course_id;
-    @Key
-    RequestSubmission submission;
+    public Enrollments[] enrollments;
 }
