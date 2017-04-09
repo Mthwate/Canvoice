@@ -18,6 +18,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import local.datetime;
 
 /**
  * @author mthwate
@@ -84,15 +85,34 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
 
 		Intent intent = request.getRequest().getIntent();
 		String intentName = intent.getName();
+		String courseName = intent.getSlot("class").getValue();
 
 		switch (intentName) {
 			case "GetGradeInClass":
-				String courseName = intent.getSlot("class").getValue();
 				return output(canvas.getCourses()[1]);
+			case "GetUpcomingInClass":
+				String courseName = intent.getSlot("class").getValue();
+				Assignment[] asses = canvas.getAssignment(courseName);
+				ArrayList<Assignment> dueAsses = new ArrayList<Assignment>();
+				for (int i = 0; i < asses.length; i++) {
+					LocalDateTime ldt = LocalDateTime.parse(asses[i].due_at);
+					if (ldt.isAfter(LocalDateTime.now())) {
+						dueAsses.add(asses[i]);
+					}
+				}
+				return output(canvas.getCourses()[1], dueAsses);
+			case "GetAssignmentGrade":
+				String courseName = intent.getSlot("class").getValue();
+				Assignment[] asses = canvas.getAssignment(courseName);
+				for (int i = 0; i < asses.length; i++) {
+					if (asses[i].getName().contains(intent.getSlot("assignment").getValue())) {
+						return output(canvas.getCourses()[1], asses[i]);
+					}
+				}
+				return toAlexa("I wasn't able to find that assignment.");
+			case "GetAllGrades":
+				return output(canvas.getCourses());
 		}
-
-
-
 
 		PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
 		outputSpeech.setText("I have no clue what you are asking.");
@@ -121,7 +141,7 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
         return SpeechletResponse.newTellResponse(speech, card);
     }
 	
-	private SpeechletResponse output(Course c, Assignment[] ass) {
+	private SpeechletResponse output(Course c, ArrayList<Assignment> ass) {
 		String out = "In " + c.toString() + " you have ";
 		for (int i = 0; i < ass.length; i++) {
 			out += ass[i].toString() + " coming up on " + ass[i].due_at;
