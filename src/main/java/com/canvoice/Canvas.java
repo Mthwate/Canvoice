@@ -52,7 +52,7 @@ public class Canvas {
 
 	 public Course[] getCourses() {
 		try {
-			return read("courses?include[]=total_scores", Course[].class);
+			return read("courses?enrollment_type=student&include[]=total_scores", Course[].class);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
