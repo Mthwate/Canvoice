@@ -13,6 +13,9 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author mthwate
@@ -52,7 +55,18 @@ public class Canvas {
 
 	 public Course[] getCourses() {
 		try {
-			return read("courses?enrollment_type=student&include[]=total_scores", Course[].class);
+			Course[] courses = read("courses?enrollment_type=student&include[]=total_scores", Course[].class);
+
+			List<Course> coursesList = new ArrayList<>();
+
+			for (Course course : courses) {
+				if (course.enrollment_term_id == 10148) {
+					coursesList.add(course);
+				}
+			}
+
+			return coursesList.toArray(new Course[0]);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

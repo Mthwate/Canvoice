@@ -18,7 +18,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import local.datetime;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 /**
  * @author mthwate
@@ -85,16 +86,16 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
 
 		Intent intent = request.getRequest().getIntent();
 		String intentName = intent.getName();
-		String courseName = intent.getSlot("class").getValue();
+
+
+
 
 		switch (intentName) {
 			case "GetGradeInClass":
-				String courseName = nameLocalToCanvas(intent.getSlot("class").getValue());
-				return output(canvas.getCourse(courseName));
+				return output(canvas.getCourse(getClassSV(intent)));
 			case "GetUpcomingInClass":
-				String courseName = intent.getSlot("class").getValue();
-				Assignment[] asses = canvas.getAssignment(courseName);
-				ArrayList<Assignment> dueAsses = new ArrayList<Assignment>();
+				Assignment[] asses = canvas.getAssignments(getClassSV(intent));
+				ArrayList<Assignment> dueAsses = new ArrayList<>();
 				for (int i = 0; i < asses.length; i++) {
 					LocalDateTime ldt = LocalDateTime.parse(asses[i].due_at);
 					if (ldt.isAfter(LocalDateTime.now())) {
@@ -103,12 +104,9 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
 				}
 				return output(canvas.getCourses()[1], dueAsses);
 			case "GetAssignmentGrade":
-				String courseName = intent.getSlot("class").getValue();
-				Assignment[] asses = canvas.getAssignment(courseName);
-				for (int i = 0; i < asses.length; i++) {
-					if (asses[i].getName().contains(intent.getSlot("assignment").getValue())) {
-						return output(canvas.getCourses()[1], asses[i]);
-					}
+				Assignment ass = canvas.getAssignment(getClassSV(intent), getAssignmentSV(intent));
+				if (ass != null) {
+					return output(canvas.getCourse(getClassSV(intent)), ass);
 				}
 				return toAlexa("I wasn't able to find that assignment.");
 			case "GetAllGrades":
@@ -143,25 +141,37 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
     }
 	
 	private SpeechletResponse output(Course c, ArrayList<Assignment> ass) {
-		String out = "In " + c.toString() + " you have ";
-		for (int i = 0; i < ass.length; i++) {
-			out += ass[i].toString() + " coming up on " + ass[i].due_at;
+		String out = "In " + nameCanvasToLocal(c.name) + " you have ";
+		for (int i = 0; i < ass.size(); i++) {
+			out += ass.get(i).toString() + " coming up on " + ass.get(i).due_at;
 		}
 		return toAlexa(out);
 	}
 		
 	private SpeechletResponse output(Course c, Assignment ass) {
-		return toAlexa("Your grade on " + ass.toString() + " in " + c.toString() + " is " + ass.submission.grade);
+		return toAlexa("Your grade on " + ass.toString() + " in " + nameCanvasToLocal(c.name) + " is " + ass.submission.grade);
 	}
 
 	private SpeechletResponse output(Course c) {
-		return toAlexa("Your grade in " + c.toString() + " is " + c.enrollments[0].computed_current_score);
+		return toAlexa("Your grade in " + nameCanvasToLocal(c.name) + " is " + c.enrollments[0].computed_current_score);
 	}
 
-	private void output(Course[] c) {
-		for (int i = 0; i < c.length; i++) {
-			output(c[i]);
+	private SpeechletResponse output(Course[] courses) {
+
+		String str = "";
+
+		for (Course c : courses) {
+
+			String name = nameCanvasToLocal(c.name);
+
+			if (name == null) {
+				name = c.name;
+			}
+
+			str += "Your grade in " + name + " is " + c.enrollments[0].computed_current_score + ". ";
 		}
+
+		return toAlexa(str);
 	}
 
 	private String nameLocalToCanvas(String name) {
@@ -177,6 +187,29 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private String nameCanvasToLocal(String name) {
+		try {
+			PreparedStatement statement = connection.prepareStatement("select local from name_map where canvas = ?");
+			statement.setString(1, name);
+			statement.execute();
+			ResultSet resultSet = statement.getResultSet();
+			if (resultSet.next()) {
+				return resultSet.getString(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private String getClassSV(Intent intent) {
+		return nameLocalToCanvas(intent.getSlot("class").getValue());
+	}
+
+	private String getAssignmentSV(Intent intent) {
+		return intent.getSlot("assignment").getValue();
 	}
 
 }

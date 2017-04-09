@@ -16,6 +16,8 @@ public class Course {
     public String public_description;
     @Key
     public Enrollments[] enrollments;
+    @Key
+    public int enrollment_term_id;
 
     @Override
     public String toString() {

@@ -2,6 +2,7 @@ GetAllGrades what are my grades
 GetAllGrades get my grades
 GetAllGrades how are my grades
 
+GetGradeInClass what is my grade in {class}
 GetGradeInClass what's my grade in {class}
 GetGradeInClass check my grade in {class}
 GetGradeInClass how am I doing in {class}
