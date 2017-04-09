@@ -80,16 +80,15 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
 			return SpeechletResponse.newTellResponse(outputSpeech, card);
 		}
 
+		Canvas canvas = new Canvas(token);
 
 		Intent intent = request.getRequest().getIntent();
 		String intentName = intent.getName();
 
 		switch (intentName) {
 			case "GetGradeInClass":
-				String clazz = intent.getSlot("class").getValue();
-				PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
-				outputSpeech.setText("You asked for your grade in " + clazz + ".");
-				return SpeechletResponse.newTellResponse(outputSpeech);
+				String courseName = intent.getSlot("class").getValue();
+				return output(canvas.getCourses()[1]);
 		}
 
 
@@ -122,20 +121,20 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
         return SpeechletResponse.newTellResponse(speech, card);
     }
 	
-	private void output(Course c, Assignment[] ass) {
+	private SpeechletResponse output(Course c, Assignment[] ass) {
 		String out = "In " + c.toString() + " you have ";
 		for (int i = 0; i < ass.length; i++) {
 			out += ass[i].toString() + " coming up on " + ass[i].due_at;
 		}
-		toAlexa(out);
+		return toAlexa(out);
 	}
 		
-	private void output(Course c, Assignment ass) {
-		toAlexa("Your grade on " + ass.toString() + " in " + c.toString() + " is " + ass.submission.grade);
+	private SpeechletResponse output(Course c, Assignment ass) {
+		return toAlexa("Your grade on " + ass.toString() + " in " + c.toString() + " is " + ass.submission.grade);
 	}
 
-	private void output(Course c) {
-		toAlexa("Your grade in " + c.toString() + " is " + c.enrollments[0].computed_current_grade);
+	private SpeechletResponse output(Course c) {
+		return toAlexa("Your grade in " + c.toString() + " is " + c.enrollments[0].computed_current_score);
 	}
 
 	private void output(Course[] c) {
