@@ -102,7 +102,7 @@ public class Canvas {
 	 	Assignment[] ra = getAssignments(courseName);
 	 	if(ra != null) {
 			for(Assignment a : ra) {
-				if(a.name.equals(assignmentName)) {
+				if(a.name.toLowerCase().equals(assignmentName.toLowerCase())) {
 					return a;
 				}
 			}
