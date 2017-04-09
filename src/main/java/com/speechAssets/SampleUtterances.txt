@@ -17,6 +17,8 @@ GetUpcomingInClass what's new in {class}
 GetUpcomingInClass what assignments are due in {class}
 GetUpcomingInClass what's next in {class}
 
+GetAllUpcoming what assignments are coming up
+
 GetAssignmentGrade what's my grade on {assignment} in {class}
 GetAssignmentGrade what'd I get on {assignment} in {class}
 GetAssignmentGrade how did I do on {assignment} in {class}

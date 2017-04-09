@@ -32,6 +32,9 @@
       ]
     },
     {
+      "intent": "GetAllUpcoming"
+    },
+    {
       "intent": "GetAllGrades"
     },
     {

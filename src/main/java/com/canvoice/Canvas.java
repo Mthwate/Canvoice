@@ -87,8 +87,8 @@ public class Canvas {
 	 }
 
 	public Assignment[] getAssignments(String courseName) {
-	 	Course course = getCourse(courseName);
-	 	if(course != null) {
+		Course course = getCourse(courseName);
+		if(course != null) {
 			try {
 				return read("courses/" + course.id + "/assignments?include[]=submissions", Assignment[].class);
 			} catch (IOException e) {
@@ -96,6 +96,21 @@ public class Canvas {
 			}
 		}
 		return null;
+	}
+
+	public Assignment[] getUpcomingAssignments(Course course) {
+		if(course != null) {
+			try {
+				return read("courses/" + course.id + "/assignments?bucket=upcoming", Assignment[].class);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	public Assignment[] getUpcomingAssignments(String courseName) {
+		return getUpcomingAssignments(getCourse(courseName));
 	}
 
 	public Assignment getAssignment(String courseName, String assignmentName) {

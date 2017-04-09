@@ -19,7 +19,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author mthwate
@@ -94,15 +96,29 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
 			case "GetGradeInClass":
 				return output(canvas.getCourse(getClassSV(intent)));
 			case "GetUpcomingInClass":
-				Assignment[] asses = canvas.getAssignments(getClassSV(intent));
-				ArrayList<Assignment> dueAsses = new ArrayList<>();
-				for (int i = 0; i < asses.length; i++) {
-					LocalDateTime ldt = LocalDateTime.parse(asses[i].due_at);
-					if (ldt.isAfter(LocalDateTime.now())) {
-						dueAsses.add(asses[i]);
+				String courseName = getClassSV(intent);
+				Assignment[] asses = canvas.getUpcomingAssignments(courseName);
+
+				if (asses == null) {
+					PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+					outputSpeech.setText("I could not find that course.");
+					return SpeechletResponse.newTellResponse(outputSpeech);
+				}
+
+				return output(canvas.getCourse(courseName), asses);
+			case "GetAllUpcoming":
+
+				Course[] courses = canvas.getCourses();
+
+				List<Assignment> assignments = new ArrayList<>();
+
+				for (Course course : courses) {
+					for (Assignment ass : canvas.getUpcomingAssignments(course)) {
+						assignments.add(ass);
 					}
 				}
-				return output(canvas.getCourses()[1], dueAsses);
+
+				return output(assignments);
 			case "GetAssignmentGrade":
 				Assignment ass = canvas.getAssignment(getClassSV(intent), getAssignmentSV(intent));
 				if (ass != null) {
@@ -139,11 +155,29 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
 
         return SpeechletResponse.newTellResponse(speech, card);
     }
-	
-	private SpeechletResponse output(Course c, ArrayList<Assignment> ass) {
+
+	private SpeechletResponse output(Course c, Assignment[] ass) {
 		String out = "In " + nameCanvasToLocal(c.name) + " you have ";
-		for (int i = 0; i < ass.size(); i++) {
-			out += ass.get(i).toString() + " coming up on " + ass.get(i).due_at;
+		if (ass.length == 0) {
+			out += "no upcoming assignments.";
+		} else {
+			for (int i = 0; i < ass.length; i++) {
+				out += ass[i].name + " coming up on " + parseDate(ass[i].due_at).format(DateTimeFormatter.ofPattern("EEEE MMMM d 'at' h:mm a")) + " ";
+			}
+		}
+		return toAlexa(out);
+	}
+
+	private SpeechletResponse output(List<Assignment> ass) {
+		String out = "You have ";
+		if (ass.size() == 0) {
+			out += "no upcoming assignments.";
+		} else {
+			for (int i = 0; i < ass.size(); i++) {
+				out += ass.get(i).name + " coming up on " + parseDate(ass.get(i).due_at).format(DateTimeFormatter.ofPattern("EEEE MMMM d 'at' h:mm a")) + ", ";
+			}
+			out = out.substring(0, out.length()-2);
+			out += ".";
 		}
 		return toAlexa(out);
 	}
@@ -210,6 +244,10 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
 
 	private String getAssignmentSV(Intent intent) {
 		return intent.getSlot("assignment").getValue();
+	}
+
+	private LocalDateTime parseDate(String date) {
+		return LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
 	}
 
 }
