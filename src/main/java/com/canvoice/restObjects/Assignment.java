@@ -17,5 +17,5 @@ public class Assignment {
     @Key
     public int course_id;
     @Key
-    Submission submission;
+    public Submission submission;
 }

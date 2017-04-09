@@ -9,7 +9,7 @@ public class Submission {
     @Key
     int assignment_id;
     @Key
-    String grade;
+    public String grade;
     @Key
     double score;
     @Key

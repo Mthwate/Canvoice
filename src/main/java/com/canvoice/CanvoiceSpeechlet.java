@@ -2,24 +2,16 @@ package com.canvoice;
 
 import com.amazon.speech.json.SpeechletRequestEnvelope;
 import com.amazon.speech.slu.Intent;
-import com.amazon.speech.slu.Slot;
 import com.amazon.speech.speechlet.IntentRequest;
 import com.amazon.speech.speechlet.LaunchRequest;
 import com.amazon.speech.speechlet.SessionEndedRequest;
 import com.amazon.speech.speechlet.SessionStartedRequest;
 import com.amazon.speech.speechlet.SpeechletResponse;
 import com.amazon.speech.speechlet.SpeechletV2;
-import com.amazon.speech.ui.Card;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
-import com.amazon.speech.ui.Reprompt;
 import com.amazon.speech.ui.SimpleCard;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
-import com.amazonaws.services.dynamodbv2.document.Table;
+import com.canvoice.restObjects.Assignment;
+import com.canvoice.restObjects.Course;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -117,7 +109,7 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
 		}
 	}
 	
-	private SpeechletResponse toAlexa(string output) {
+	private SpeechletResponse toAlexa(String output) {
         // Create the Simple card content.
         SimpleCard card = new SimpleCard();
         card.setTitle("CanVoice");
@@ -131,7 +123,7 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
     }
 	
 	private void output(Course c, Assignment[] ass) {
-		string out = "In " + c.ToString() + " you have ";
+		String out = "In " + c.toString() + " you have ";
 		for (int i = 0; i < ass.length; i++) {
 			out += ass[i].toString() + " coming up on " + ass[i].due_at;
 		}
@@ -139,11 +131,11 @@ public class CanvoiceSpeechlet implements SpeechletV2 {
 	}
 		
 	private void output(Course c, Assignment ass) {
-		toAlexa("Your grade on " + ass.ToString() + " in " + c.ToString() + " is " + ass.submission.grade);
+		toAlexa("Your grade on " + ass.toString() + " in " + c.toString() + " is " + ass.submission.grade);
 	}
 
 	private void output(Course c) {
-		toAlexa("Your grade in " + c.ToString() + " is " + c.enrollments[0].computed_current_grade());
+		toAlexa("Your grade in " + c.toString() + " is " + c.enrollments[0].computed_current_grade);
 	}
 
 	private void output(Course[] c) {
