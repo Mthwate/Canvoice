@@ -11,7 +11,7 @@ public class Submission {
     @Key
     public String grade;
     @Key
-    double score;
+    Double score;
     @Key
     String submission_comments; // why not lol
     @Key
