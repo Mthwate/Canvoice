@@ -15,5 +15,5 @@ public class RequestCourses {
     @Key
     public String public_description;
     @Key
-    public RequestEnrollments enrollments;
+    public RequestEnrollments[] enrollments;
 }

@@ -1,5 +1,7 @@
 package com.canvoice;
 
+import com.canvoice.restObjects.RequestAssignment;
+import com.canvoice.restObjects.RequestAssignmentGroup;
 import com.canvoice.restObjects.RequestCourses;
 import com.google.api.client.auth.oauth2.BearerToken;
 import com.google.api.client.auth.oauth2.Credential;
@@ -35,19 +37,64 @@ public class Canvas {
 		return response.parseAs(dataClass);
 	}
 
-	public String getCourseGrade(String courseName) {
-		String courseGrade = "Unable to get classes.";
+//	public String getCourseGrade(String courseName) {
+//		String courseGrade = "Unable to get classes.";
+//		try {
+//			RequestCourses[] ca = read("courses", RequestCourses[].class);
+//			for (RequestCourses c : ca) {
+//				if(c.name.equals(courseName) || c.course_code.equals(courseName)) {
+//					courseGrade = c.enrollments[0].computed_current_grade;
+//				}
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		return courseGrade;
+//	}
+
+	 public RequestCourses[] getCourses() {
 		try {
-			RequestCourses[] ca = read("courses", RequestCourses[].class);
-			for (RequestCourses c : ca) {
-				if(c.name.equals(courseName) || c.course_code.equals(courseName)) {
-					courseGrade = c.enrollments.computed_current_grade;
-				}
-			}
+			return read("courses", RequestCourses[].class);
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		}
-		return courseGrade;
+	 }
+
+	 public RequestCourses getCourse(String courseName){
+
+		RequestCourses[] ca = getCourses();
+		if(ca != null) {
+			for (RequestCourses c : ca) {
+				if (c.name.equals(courseName) || c.name.equals(courseName)) {
+					return c;
+				}
+			}
+		}
+		return null;
+	 }
+
+	public RequestAssignment[] getAssignments(String courseName) {
+	 	RequestCourses course = getCourse(courseName);
+	 	if(course != null) {
+			try {
+				return read("courses/" + course.id + "/assignments", RequestAssignment[].class);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 
+	public RequestAssignment getAssignment(String courseName, String assignmentName) {
+	 	RequestAssignment[] ra = getAssignments(courseName);
+	 	if(ra != null) {
+			for(RequestAssignment a : ra) {
+				if(a.name.equals(assignmentName)) {
+					return a;
+				}
+			}
+		}
+		return null;
+	}
 }
